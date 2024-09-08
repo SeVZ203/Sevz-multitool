@@ -1,9 +1,8 @@
 ﻿using System;
 
-public static class Target
+public static class SetIP
 {
     private static string savedIp = string.Empty;
-
     public static void SetIp()
     {
         Console.Write("IP 주소를 입력하세요: ");
@@ -19,6 +18,7 @@ public static class Target
             Console.WriteLine("잘못된 IP 형식입니다. 다시 시도하세요.");
         }
     }
+
 
     public static string GetSavedIp()
     {
@@ -40,4 +40,6 @@ public static class Target
         }
         return true;
     }
+
+
 }

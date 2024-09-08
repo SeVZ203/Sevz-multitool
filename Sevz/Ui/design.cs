@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sevz
+namespace Sevz.Ui
 {
     public static class design
     {
@@ -16,6 +16,8 @@ namespace Sevz
             //Console.WriteLine("    S E        V     Z    ");
             //Console.WriteLine(" SSS  EEEEE    V    ZZZZZ ");
         }
+
+
     }
 }
 
