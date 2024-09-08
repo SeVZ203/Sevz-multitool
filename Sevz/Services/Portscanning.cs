@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Sevz.Models;
 
 namespace Sevz.Services
 {
@@ -12,18 +13,7 @@ namespace Sevz.Services
         public static async Task ScanPortsAsync(string ip)
         {
 
-            // 경고 메시지 출력
-            Console.WriteLine("경고: 이 작업은 공격 기법으로 간주될 수 있으며, 사용자는 이에 따른 책임이 있습니다.");
-            Console.WriteLine("계속 진행하시겠습니까? (Y/N)");
-
-            // 사용자 입력 받기
-            string userInput = Console.ReadLine();
-
-            if (userInput?.ToUpper() != "Y")
-            {
-                Console.WriteLine("작업이 취소되었습니다.");
-                return;
-            }
+            info.AlertWarning();
 
             Console.WriteLine($"IP {ip}의 포트를 스캔합니다...");
 

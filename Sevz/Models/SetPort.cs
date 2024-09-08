@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sevz.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,14 +23,22 @@ public static class SetPort
                 Console.WriteLine("잘못된 Port입니다, 다시 시도하세요.");
             }
         }
-    public static string GetSavedport()
+    public static string GetSavedPort()
     {
-        return savedPort;
+        // 사용자가 입력한 포트가 있으면 해당 값을 반환
+        return !string.IsNullOrEmpty(savedPort) ? savedPort : PasswordService.GetPort();
     }
 
-    private static bool IsValidPort(string port)
+    // 기본 포트만 반환하는 메서드 (변경 전 기본값)
+    public static string GetDefaultPort()
     {
-        // 포트 번호 유효성 검사
+        return PasswordService.GetPort(); // 기본 포트를 반환
+    }
+
+
+    private static bool IsValidPort(string port) // 포트 번호 유효성 검사
+    {
+        
         if (int.TryParse(port, out int portNum))
         {
             // 포트 번호가 0 이상 65535 이하인 경우 유효

@@ -1,4 +1,9 @@
-﻿using System;
+﻿using Sevz.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 public static class SetIP
 {
@@ -22,7 +27,14 @@ public static class SetIP
 
     public static string GetSavedIp()
     {
-        return savedIp;
+        // 사용자가 입력한 IP가 있으면 해당 값을 반환, 없으면 기본 IP를 반환
+        return !string.IsNullOrEmpty(savedIp) ? savedIp : PasswordService.GetIPAddress();
+    }
+
+    // 기본 IP만 반환하는 메서드 (변경 전 기본값)
+    public static string GetDefaultIp()
+    {
+        return PasswordService.GetIPAddress(); // 기본 IP를 반환
     }
 
     private static bool IsValidIp(string ip)

@@ -13,19 +13,19 @@ class Program
         PasswordService.LoadConfiguration(); //appsetting 설정된 비밀번호 체크
         design.PrintSevz();
 
-        if (!PasswordService.CheckPassword()) 
-        {
-            Console.WriteLine("비밀번호가 틀렸습니다. 프로그램을 종료합니다.");
-            return;
-        }
-        Console.WriteLine("비밀번호가 확인되었습니다. 프로그램을 시작합니다.");
+        //if (!PasswordService.CheckPassword()) 
+        //{
+        //    Console.WriteLine("비밀번호가 틀렸습니다. 프로그램을 종료합니다.");
+        //    return;
+        //}
+        //Console.WriteLine("비밀번호가 확인되었습니다. 프로그램을 시작합니다.");
 
         design.PrintSevz();
         while (true)
         {
             Console.WriteLine("원하는 번호를 선택하세요");
-            Console.WriteLine("1. 옵션 1");
-            Console.WriteLine("2. 옵션 2");
+            Console.WriteLine("1. XSS");
+            Console.WriteLine("2. SQL Injections");
             Console.WriteLine("3. 옵션 3");
             Console.WriteLine("4. 옵션 4");
             Console.WriteLine("5. IP 설정");
@@ -38,10 +38,12 @@ class Program
             switch (input)
             {
                 case "1":
-                    Console.WriteLine("옵션 1을 선택하셨습니다.");
+                    Console.WriteLine("XSS 을 선택하셨습니다.");
+                    //xss
                     break;
                 case "2":
-                    Console.WriteLine("옵션 2를 선택하셨습니다.");
+                    Console.WriteLine("SQL Injections 를 선택하셨습니다.");
+                    sqlinjections_vulnerable.sqlinjection();
                     break;
                 case "3":
                     Console.WriteLine("옵션 3을 선택하셨습니다.");
