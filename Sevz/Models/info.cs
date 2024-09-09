@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VulnerabilityScanner;
 
 namespace Sevz.Models
 {
@@ -60,5 +61,39 @@ namespace Sevz.Models
                 return;
             }
         }
+        // XSS 및 SQL Injection 스캐너 호출
+        public static async Task PerformVulnerabilityScan()
+        {
+            Console.Write("스캔할 URL을 입력하세요 (http/https 포함): ");
+            string url = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(url))
+            {
+                Console.WriteLine("유효하지 않은 URL입니다. 스캔을 종료합니다.");
+                return;
+            }
+
+            // 포트 입력받기 또는 저장된 포트 가져오기
+            Console.Write("포트를 입력하세요 (빈칸일 경우 저장된 포트 사용): ");
+            string portInput = Console.ReadLine();
+
+            string port;
+            if (string.IsNullOrEmpty(portInput))
+            {
+                port = SetPort.GetSavedPort();  // 저장된 포트를 가져옴
+                Console.WriteLine($"저장된 포트를 사용합니다: {port}");
+            }
+            else
+            {
+                port = portInput;
+                Console.WriteLine($"입력한 포트를 사용합니다: {port}");
+            }
+
+            // 포트를 URL에 추가
+            string fullUrl = $"{url}:{port}";
+
+            await Suggestions.ScanForXssAndSqlInjection(fullUrl);
+        }
     }
 }
+

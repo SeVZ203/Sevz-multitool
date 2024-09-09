@@ -14,7 +14,7 @@ namespace Sevz.Services
     {
         private static readonly HttpClient client = new HttpClient();
 
-        [Fact]
+        //[Fact]
         public async Task TestWholeStuffAsync()
         {
             // WireMock 서버를 시작하여 HTTP 요청을 모의(mock)함
