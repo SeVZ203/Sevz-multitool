@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -93,6 +94,21 @@ namespace Sevz.Models
             string fullUrl = $"{url}:{port}";
 
             await Suggestions.ScanForXssAndSqlInjection(fullUrl);
+        }
+
+        public static class PasswordManager
+        {
+            public static List<string> LoadPasswords()
+            {
+                var builder = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("Configurations/passwordex.json", optional: false, reloadOnChange: true);
+
+                IConfigurationRoot configuration = builder.Build();
+
+                var passwords = configuration.GetSection("passwords").Get<List<string>>();
+                return passwords;
+            }
         }
     }
 }

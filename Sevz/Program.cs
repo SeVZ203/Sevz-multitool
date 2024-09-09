@@ -26,7 +26,7 @@ class Program
             Console.WriteLine("원하는 번호를 선택하세요");
             Console.WriteLine("1. XSS");
             Console.WriteLine("2. SQL Injections");
-            Console.WriteLine("3. 옵션 3");
+            Console.WriteLine("3. Brute Force");
             Console.WriteLine("4. 옵션 4");
             Console.WriteLine("5. IP 설정");
             Console.WriteLine("6. 포트 설정");
@@ -49,6 +49,14 @@ class Program
                     break;
                 case "3":
                     Console.WriteLine("옵션 3을 선택하셨습니다.");
+                    Console.Write("타겟 로그인 URL을 입력하세요: ");
+                    string loginUrl = Console.ReadLine();
+
+                    Console.Write("타겟 사용자 이름을 입력하세요: ");
+                    string username = Console.ReadLine();
+
+                    // Brute force attack 시작
+                    await BruteforceAttack.PerformBruteforceAttack(loginUrl, username);
                     break;
                 case "4":
                     Console.WriteLine("옵션 4를 선택하셨습니다.");
@@ -76,7 +84,6 @@ class Program
                 case "9":
                     await info.PerformVulnerabilityScan(); // Info 클래스의 메서드 호출
                     break;
-
                 default:
                     Console.WriteLine("잘못된 입력입니다. 다시 선택하세요.");
                     continue;

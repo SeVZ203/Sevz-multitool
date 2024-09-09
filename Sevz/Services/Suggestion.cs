@@ -79,7 +79,7 @@ namespace VulnerabilityScanner
                     }
                 }
             }
-
+            
             if (detectedxssCount > 0)
             {
                 Console.WriteLine($"\n총 {detectedxssCount}개의 XSS 취약점이 발견되었습니다.");
