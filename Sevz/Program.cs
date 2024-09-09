@@ -27,7 +27,7 @@ class Program
             Console.WriteLine("1. XSS");
             Console.WriteLine("2. SQL Injections");
             Console.WriteLine("3. Brute Force");
-            Console.WriteLine("4. 옵션 4");
+            Console.WriteLine("4. ICMP");
             Console.WriteLine("5. IP 설정");
             Console.WriteLine("6. 포트 설정");
             Console.WriteLine("7. 포트 스캐닝");
@@ -59,7 +59,7 @@ class Program
                     await BruteforceAttack.PerformBruteforceAttack(loginUrl, username);
                     break;
                 case "4":
-                    Console.WriteLine("옵션 4를 선택하셨습니다.");
+                    Sevz.Services.ICMPAttack.ICMP();
                     break;
                 case "5":
                     SetIP.SetIp(); //IP 설정 메서드 호출
