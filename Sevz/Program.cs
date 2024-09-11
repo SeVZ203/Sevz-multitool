@@ -11,6 +11,7 @@ class Program
 {
     static async Task Main(string[] args)
     {
+        PasswordService.LoadConfiguration();
         //PasswordService.LoadConfiguration(); //appsetting 설정된 비밀번호 체크
         //design.PrintSevz();
 

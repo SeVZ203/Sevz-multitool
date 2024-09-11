@@ -1,16 +1,155 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using System;
-using System.Net.Http;
+﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
+using System.Net.Http;
 using System.Threading.Tasks;
-using Sevz.Services;
-using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace VulnerabilityScanner
 {
     public static class Suggestions
     {
-        // XSS 및 SQL Injection 취약점 스캐너
+        // 사용자로부터 폴더 경로를 입력받고 PHP 파일을 스캔
+        public static async Task suggetions()
+        {
+            // 사용자로부터 폴더 경로 입력받기
+            Console.Write("탐색할 폴더 경로를 입력하세요: ");
+            string folderPath = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(folderPath) || !Directory.Exists(folderPath))
+            {
+                Console.WriteLine("유효하지 않은 폴더 경로입니다.");
+                return;
+            }
+
+            // 각 .php 파일의 내용을 읽어서 변수에 저장
+            List<string> phpFiles = GetPhpFiles(folderPath);
+
+            if (phpFiles.Count == 0)
+            {
+                Console.WriteLine("지정된 폴더에 .php 파일이 없습니다.");
+                return;
+            }
+
+            // 각 .php 파일의 내용을 읽어서 출력 또는 취약점 스캔
+            foreach (string filePath in phpFiles)
+            {
+                ScanForXssWithLineNumbers(filePath);
+            }
+        }
+
+        // 특정 폴더에서 .php 파일을 탐지하는 함수
+        private static List<string> GetPhpFiles(string folderPath)
+        {
+            List<string> phpFiles = new List<string>();
+
+            try
+            {
+                // 모든 .php 파일을 검색
+                string[] files = Directory.GetFiles(folderPath, "*.php", SearchOption.AllDirectories);
+
+                // 리스트에 파일 경로 추가
+                phpFiles.AddRange(files);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"폴더 접근 중 오류 발생: {ex.Message}");
+            }
+
+            return phpFiles;
+        }
+
+        // XSS 취약점 스캔 (라인 번호 포함)
+        private static void ScanForXssWithLineNumbers(string filePath)
+        {
+            Console.WriteLine($"\n{filePath} 파일에서 XSS 취약점 스캔 중...");
+
+            // XSS 패턴 정의
+            string[] xssPatterns = new string[]
+            {
+                @"<script.*?>.*?</script>",  // 스크립트 태그
+                @"javascript:.*",            // 자바스크립트 호출
+                @"<img.*?onerror=.*?>",       // 이미지 태그에 onerror 이벤트
+                @"<.*?onmouseover=.*?>"       // onmouseover 이벤트
+            };
+            int detectedxssCount = 0;
+            try
+            {
+                using (StreamReader reader = new StreamReader(filePath))
+                {
+                    string line;
+                    int lineNumber = 0;
+                    bool found = false;
+
+                    // 파일을 한 줄씩 읽음
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        lineNumber++;
+
+                        foreach (var pattern in xssPatterns)
+                        {
+                            // XSS 패턴을 검색
+                            if (Regex.IsMatch(line, pattern, RegexOptions.IgnoreCase))
+                            {
+                                detectedxssCount++;
+                                found = true;
+                                Console.WriteLine($"[XSS] 라인 {lineNumber}: {line.Trim()}");
+                            }
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        Console.WriteLine("XSS 취약점이 발견되지 않았습니다.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"파일 스캔 중 오류 발생: {ex.Message}");
+            }
+            Console.WriteLine($"[XSS] 발견됨: {detectedxssCount}개 잠재적인 XSS 취약점");
+        }
+
+        // XSS 취약점 스캔 (웹 페이지에 대한)
+        private static void ScanForXss(string pageSource)
+        {
+            Console.WriteLine("\nXSS 취약점 스캔 중...");
+
+            string[] xssPatterns = new string[]
+            {
+                @"<script.*?>.*?</script>",  // 스크립트 태그
+                @"javascript:.*",            // 자바스크립트 호출
+                @"<img.*?onerror=.*?>",       // 이미지 태그에 onerror 이벤트
+                @"<.*?onmouseover=.*?>"       // onmouseover 이벤트
+            };
+            int detectedxssCount = 0;
+
+            foreach (var pattern in xssPatterns)
+            {
+                MatchCollection matches = Regex.Matches(pageSource, pattern, RegexOptions.IgnoreCase);
+                if (matches.Count > 0)
+                {
+                    detectedxssCount++;
+                    Console.WriteLine($"[XSS] 발견됨: {matches.Count}개 잠재적인 XSS 취약점:");
+                    foreach (Match match in matches)
+                    {
+                        Console.WriteLine($" - {match.Value}");
+                    }
+                }
+            }
+
+            if (detectedxssCount > 0)
+            {
+                Console.WriteLine($"\n총 {detectedxssCount}개의 XSS 취약점이 발견되었습니다.");
+            }
+            else
+            {
+                Console.WriteLine("XSS 취약점이 발견되지 않았습니다.");
+            }
+        }
+
+        // XSS 및 SQL Injection 취약점 스캐너 (웹 페이지에 대한)
         public static async Task ScanForXssAndSqlInjection(string url)
         {
             try
@@ -50,48 +189,8 @@ namespace VulnerabilityScanner
             }
         }
 
-        // XSS 취약점 스캔
-        private static void ScanForXss(string pageSource)
-        {
-            Console.WriteLine("\nXSS 취약점 스캔 중...");
 
-            string[] xssPatterns = new string[]
-            {
-                @"<script.*?>.*?</script>",  // 스크립트 태그
-                @"javascript:.*",            // 자바스크립트 호출
-                @"<img.*?onerror=.*?>",       // 이미지 태그에 onerror 이벤트
-                @"<.*?onmouseover=.*?>"       // onmouseover 이벤트
-            };
-            int detectedxssCount = 0;
-
-            bool found = false;
-
-            foreach (var pattern in xssPatterns)
-            {
-                MatchCollection matches = Regex.Matches(pageSource, pattern, RegexOptions.IgnoreCase);
-                if (matches.Count > 0)
-                {
-                    detectedxssCount++;
-                    found = true;
-                    Console.WriteLine($"[XSS] 발견됨: {matches.Count}개 잠재적인 XSS 취약점:");
-                    foreach (Match match in matches)
-                    {
-                        Console.WriteLine($" - {match.Value}");
-                    }
-                }
-            }
-            
-            if (detectedxssCount > 0)
-            {
-                Console.WriteLine($"\n총 {detectedxssCount}개의 XSS 취약점이 발견되었습니다.");
-            }
-            else
-            {
-                Console.WriteLine("XSS 취약점이 발견되지 않았습니다.");
-            }
-        }
-
-        // SQL Injection 취약점 스캔
+        // SQL Injection 취약점 스캔 (웹 페이지에 대한)
         private static async Task ScanForSqlInjection(string url)
         {
             Console.WriteLine("\nSQL Injection 취약점 스캔 중...");
@@ -176,7 +275,6 @@ namespace VulnerabilityScanner
             }
         }
 
-        //sqlinjections_vulnerable.sqlinjection();
         private static async Task<string> SendHttpRequest(string url)
         {
             using (HttpClient client = new HttpClient())
@@ -186,67 +284,9 @@ namespace VulnerabilityScanner
             }
         }
 
-        // SQL Injection 탐지 방법
         private static bool IsSqlInjectionDetected(string responseContent)
         {
-            // SQL 오류 메시지나 비정상적인 응답 확인 (간단한 예시)
             return responseContent.Contains("SQL syntax") || responseContent.Contains("database error");
-        }
-
-        public static async Task suggetions()
-        {
-            // 특정 폴더 경로를 입력 받기
-            IConfiguration config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("Configurations/appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-
-            // 해당 폴더에 있는 모든 .php 파일을 탐색
-            string folderPath = config["TargetFolder:Folder"];
-            if (string.IsNullOrEmpty(folderPath))
-            {
-                Console.WriteLine("파일 경로를 확인해주세요.");
-                return;
-            }
-
-            // 각 .php 파일의 내용을 읽어서 변수에 저장
-            List<string> phpFiles = GetPhpFiles(folderPath);
-
-            if (phpFiles.Count == 0)
-            {
-                Console.WriteLine("No .php files found in the specified folder.");
-                return;
-            }
-
-            // 각 .php 파일의 내용을 읽어서 출력 또는 변수에 저장
-            foreach (string filePath in phpFiles)
-            {
-                string fileContent = File.ReadAllText(filePath);
-                ScanForXss(fileContent);
-                //Console.WriteLine($"File: {filePath}");
-                //Console.WriteLine(fileContent);
-            }
-        }
-
-        // 특정 폴더에서 .php 파일을 탐지하는 함수
-        private static List<string> GetPhpFiles(string folderPath)
-        {
-            List<string> phpFiles = new List<string>();
-
-            try
-            {
-                // 모든 .php 파일을 검색
-                string[] files = Directory.GetFiles(folderPath, "*.php", SearchOption.AllDirectories);
-
-                // 리스트에 파일 경로 추가
-                phpFiles.AddRange(files);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error accessing folder: {ex.Message}");
-            }
-
-            return phpFiles;
         }
     }
 }
