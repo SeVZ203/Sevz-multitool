@@ -81,8 +81,8 @@ namespace Sevz.Models
             string port;
             if (string.IsNullOrEmpty(portInput))
             {
-                port = SetPort.GetSavedPort();  // 저장된 포트를 가져옴
-                Console.WriteLine($"저장된 포트를 사용합니다: {port}");
+                //port = SetPort.GetSavedPort();  // 저장된 포트를 가져옴
+                //Console.WriteLine($"저장된 포트를 사용합니다: {port}");
             }
             else
             {
@@ -91,11 +91,10 @@ namespace Sevz.Models
             }
 
             // 포트를 URL에 추가
-            string fullUrl = $"{url}:{port}";
+            string fullUrl = $"{url}:{portInput}";
 
-            await Suggestions.ScanForXssAndSqlInjection(fullUrl);
+            await Suggestions.ScanForXssAndSqlInjection(url);
         }
-
         public static class PasswordManager
         {
             public static List<string> LoadPasswords()
@@ -108,6 +107,17 @@ namespace Sevz.Models
 
                 var passwords = configuration.GetSection("passwords").Get<List<string>>();
                 return passwords;
+            }
+            public static List<string> LoadAppsettings()
+            {
+                var builder = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("Configurations/appsettings.json", optional: false, reloadOnChange: true);
+
+                IConfigurationRoot configuration = builder.Build();
+
+                var appsettings = configuration.GetSection("appsettings").Get<List<string>>();
+                return appsettings;
             }
         }
     }

@@ -5,13 +5,14 @@ using System.IO;
 using Sevz.Ui;
 using Sevz.Services;
 using Sevz.Models;
+using VulnerabilityScanner;
 
 class Program
 {
     static async Task Main(string[] args)
     {
-        PasswordService.LoadConfiguration(); //appsetting 설정된 비밀번호 체크
-        design.PrintSevz();
+        //PasswordService.LoadConfiguration(); //appsetting 설정된 비밀번호 체크
+        //design.PrintSevz();
 
         //if (!PasswordService.CheckPassword()) 
         //{
@@ -20,7 +21,7 @@ class Program
         //}
         //Console.WriteLine("비밀번호가 확인되었습니다. 프로그램을 시작합니다.");
 
-        design.PrintSevz();
+        //design.PrintSevz();
         while (true)
         {
             Console.WriteLine("원하는 번호를 선택하세요");
@@ -33,6 +34,7 @@ class Program
             Console.WriteLine("7. 포트 스캐닝");
             Console.WriteLine("8. 정보 출력 (IP 및 포트)");
             Console.WriteLine("9. 분석제안");
+            Console.WriteLine("10. 코드분석");
             Console.Write(">>");
             string input = Console.ReadLine();
 
@@ -48,15 +50,8 @@ class Program
                     sqlinjections_vulnerable.sqlinjection();
                     break;
                 case "3":
-                    Console.WriteLine("옵션 3을 선택하셨습니다.");
-                    Console.Write("타겟 로그인 URL을 입력하세요: ");
-                    string loginUrl = Console.ReadLine();
-
-                    Console.Write("타겟 사용자 이름을 입력하세요: ");
-                    string username = Console.ReadLine();
-
                     // Brute force attack 시작
-                    await BruteforceAttack.PerformBruteforceAttack(loginUrl, username);
+                    await BruteforceAttack.PerformBruteforceAttack(args);
                     break;
                 case "4":
                     Sevz.Services.ICMPAttack.ICMP();
@@ -83,6 +78,9 @@ class Program
                     break;
                 case "9":
                     await info.PerformVulnerabilityScan(); // Info 클래스의 메서드 호출
+                    break;
+                case "10":
+                    await Suggestions.suggetions();
                     break;
                 default:
                     Console.WriteLine("잘못된 입력입니다. 다시 선택하세요.");
