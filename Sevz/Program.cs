@@ -37,6 +37,7 @@ class Program
             Console.WriteLine("9. 분석제안");
             Console.WriteLine("10. 코드분석");
             Console.WriteLine("11. 서버분석");
+            Console.WriteLine("12. gpt");
             Console.Write(">>");
             string input = Console.ReadLine();
 
@@ -86,6 +87,9 @@ class Program
                     break;
                 case "11":
                     await info.GatheringServerInfo();
+                    break;
+                case "12":
+                    GPT.chatgpt(args);
                     break;
                 default:
                     Console.WriteLine("잘못된 입력입니다. 다시 선택하세요.");
