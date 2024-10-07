@@ -38,6 +38,7 @@ namespace Sevz.Services
             {
                 foreach (string password in passwordList)
                 {
+                    //todo
                     // 로그인 폼 데이터 설정
                     var postData = new FormUrlEncodedContent(new[]
                     {

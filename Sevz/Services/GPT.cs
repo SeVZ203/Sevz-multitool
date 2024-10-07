@@ -9,7 +9,7 @@ using System.Collections.Generic;
 public class GPT
 {
     private static readonly string apiKey = "YOUR_OPENAI_API_KEY"; // OpenAI API 키를 여기에 입력하세요
-    private static readonly string apiUrl = "https://api.openai.com/v1/completions";
+    private static readonly string apiUrl = "https://chatgpt.com/g/g-l8UrxNxHA-sevz";
 
     public static async Task chatgpt(string[] args)
     {
