@@ -37,7 +37,7 @@ namespace Sevz.Models
         {
             // 경고 메시지 출력
             Console.WriteLine("경고: 이 작업은 공격 기법으로 간주될 수 있으며, 사용자는 이에 따른 책임이 있습니다.");
-            Console.WriteLine("계속 진행하시겠습니까? (Y/N)");
+            Console.Write("계속 진행하시겠습니까? (Y/N)");
 
             // 사용자 입력 받기
             string userInput = Console.ReadLine();
