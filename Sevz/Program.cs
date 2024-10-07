@@ -6,95 +6,110 @@ using Sevz.Ui;
 using Sevz.Services;
 using Sevz.Models;
 using VulnerabilityScanner;
+using System.Collections.Generic;
 
 class Program
 {
+    // 사용자 입력과 메서드 실행을 매핑하는 Dictionary
+    private static readonly Dictionary<string, Func<Task>> actions = new Dictionary<string, Func<Task>>
+    {
+        { "1", async () => await ExecuteXssScanner() },
+        { "2", () => { ExecuteSqlInjections(); return Task.CompletedTask; } },
+        { "3", async () => await ExecuteBruteForceAttack(null) },
+        { "4", () => { ExecuteIcmpAttack(); return Task.CompletedTask; } },
+        { "5", () => { SetIP.SetIp(); return Task.CompletedTask; } },
+        { "6", () => { SetPort.SetPORT(); return Task.CompletedTask; } },
+        { "7", async () => await ExecutePortScanning() },
+        { "8", () => { info.ShowInfo(); return Task.CompletedTask; } },
+        { "9", async () => await info.PerformVulnerabilityScan() },
+        { "10", async () => await Suggestions.suggetions() },
+        { "11", async () => await info.GatheringServerInfo() },
+        { "12", () => { GPT.chatgpt(null); return Task.CompletedTask; } }
+    };
+
     static async Task Main(string[] args)
     {
+        // 비밀번호 설정 로드
         PasswordService.LoadConfiguration();
-        //PasswordService.LoadConfiguration(); //appsetting 설정된 비밀번호 체크
-        //design.PrintSevz();
 
-        //if (!PasswordService.CheckPassword()) 
-        //{
-        //    Console.WriteLine("비밀번호가 틀렸습니다. 프로그램을 종료합니다.");
-        //    return;
-        //}
-        //Console.WriteLine("비밀번호가 확인되었습니다. 프로그램을 시작합니다.");
-
-        //design.PrintSevz();
         while (true)
         {
-            Console.WriteLine("원하는 번호를 선택하세요");
-            Console.WriteLine("1. XSS");
-            Console.WriteLine("2. SQL Injections");
-            Console.WriteLine("3. Brute Force");
-            Console.WriteLine("4. ICMP");
-            Console.WriteLine("5. IP 설정");
-            Console.WriteLine("6. 포트 설정");
-            Console.WriteLine("7. 포트 스캐닝");
-            Console.WriteLine("8. 정보 출력 (IP 및 포트)");
-            Console.WriteLine("9. 분석제안");
-            Console.WriteLine("10. 코드분석");
-            Console.WriteLine("11. 서버분석");
-            Console.WriteLine("12. gpt");
-            Console.Write(">>");
+            DisplayMenu(); // 메뉴 출력
+
             string input = Console.ReadLine();
 
-            switch (input)
+            // 입력에 해당하는 메서드가 존재하면 실행, 없으면 오류 메시지 출력
+            if (actions.ContainsKey(input))
             {
-                case "1":
-                    Console.WriteLine("XSS 을 선택하셨습니다.");
-                    XssScannerTest xssScanner = new XssScannerTest();
-                    await xssScanner.TestWholeStuffAsync();
-                    break;
-                case "2":
-                    Console.WriteLine("SQL Injections 를 선택하셨습니다.");
-                    sqlinjections_vulnerable.sqlinjection();
-                    break;
-                case "3":
-                    // Brute force attack 시작
-                    await BruteforceAttack.PerformBruteforceAttack(args);
-                    break;
-                case "4":
-                    Sevz.Services.ICMPAttack.ICMP();
-                    break;
-                case "5":
-                    SetIP.SetIp(); //IP 설정 메서드 호출
-                    break;
-                case "6":
-                    SetPort.SetPORT();
-                    break;
-                case "7":
-                    string savedIp = SetIP.GetSavedIp(); // 저장된 IP 가져와 포트스캐닝
-                    if (!string.IsNullOrEmpty(savedIp))
-                    {
-                        await PortScanning.ScanPortsAsync(savedIp);
-                    }
-                    else
-                    {
-                        Console.WriteLine("먼저 IP 주소를 설정하세요.");
-                    }
-                    break;
-                case "8":
-                    info.ShowInfo(); // 저장된 IP와 포트 정보를 테이블 형식으로 출력
-                    break;
-                case "9":
-                    await info.PerformVulnerabilityScan(); // Info 클래스의 메서드 호출
-                    break;
-                case "10":
-                    await Suggestions.suggetions();
-                    break;
-                case "11":
-                    await info.GatheringServerInfo();
-                    break;
-                case "12":
-                    GPT.chatgpt(args);
-                    break;
-                default:
-                    Console.WriteLine("잘못된 입력입니다. 다시 선택하세요.");
-                    continue;
+                await actions[input]();
             }
+            else
+            {
+                Console.WriteLine("잘못된 입력입니다. 다시 선택하세요.");
+            }
+        }
+    }
+
+    // 메뉴 출력 메서드
+    static void DisplayMenu()
+    {
+        Console.WriteLine("\n=== 보안 프로그램 메뉴 ===");
+        Console.WriteLine("1. XSS");
+        Console.WriteLine("2. SQL Injections");
+        Console.WriteLine("3. Brute Force");
+        Console.WriteLine("4. ICMP");
+        Console.WriteLine("5. IP 설정");
+        Console.WriteLine("6. 포트 설정");
+        Console.WriteLine("7. 포트 스캐닝");
+        Console.WriteLine("8. 정보 출력 (IP 및 포트)");
+        Console.WriteLine("9. 분석제안");
+        Console.WriteLine("10. 코드분석");
+        Console.WriteLine("11. 서버분석");
+        Console.WriteLine("12. GPT");
+        Console.Write("원하는 번호를 선택하세요: ");
+    }
+
+    // XSS 스캐너 실행 메서드
+    static async Task ExecuteXssScanner()
+    {
+        Console.WriteLine("XSS 을 선택하셨습니다.");
+        XssScannerTest xssScanner = new XssScannerTest();
+        await xssScanner.TestWholeStuffAsync();
+    }
+
+    // SQL Injection 실행 메서드
+    static void ExecuteSqlInjections()
+    {
+        Console.WriteLine("SQL Injections 를 선택하셨습니다.");
+        sqlinjections_vulnerable.sqlinjection();
+    }
+
+    // Brute Force 공격 실행 메서드
+    static async Task ExecuteBruteForceAttack(string[] args)
+    {
+        Console.WriteLine("Brute Force 공격을 시작합니다.");
+        await BruteforceAttack.PerformBruteforceAttack(args);
+    }
+
+    // ICMP 공격 실행 메서드
+    static void ExecuteIcmpAttack()
+    {
+        Console.WriteLine("ICMP 공격을 시작합니다.");
+        Sevz.Services.ICMPAttack.ICMP();
+    }
+
+    // 포트 스캐닝 실행 메서드
+    static async Task ExecutePortScanning()
+    {
+        string savedIp = SetIP.GetSavedIp(); // 저장된 IP 가져오기
+        if (!string.IsNullOrEmpty(savedIp))
+        {
+            Console.WriteLine("포트 스캐닝을 시작합니다.");
+            await PortScanning.ScanPortsAsync(savedIp);
+        }
+        else
+        {
+            Console.WriteLine("먼저 IP 주소를 설정하세요.");
         }
     }
 }
