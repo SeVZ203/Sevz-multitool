@@ -14,7 +14,7 @@ class Program
     private static readonly Dictionary<string, Func<Task>> actions = new Dictionary<string, Func<Task>>
     {
         { "1", async () => await ExecuteXssScanner() },
-        { "2", () => { ExecuteSqlInjections(); return Task.CompletedTask; } },
+        { "2", async () => await ExecuteSqlInjections() },  // 수정: 비동기 함수로 선언
         { "3", async () => await ExecuteBruteForceAttack(null) },
         { "4", () => { ExecuteIcmpAttack(); return Task.CompletedTask; } },
         { "5", () => { SetIP.SetIp(); return Task.CompletedTask; } },
@@ -29,15 +29,6 @@ class Program
 
     static async Task Main(string[] args)
     {
-        //PasswordService.LoadConfiguration();
-        //PasswordService.LoadConfiguration(); //appsetting 설정된 비밀번호 체크
-        ////design.PrintSevz();
-        //if (!PasswordService.CheckPassword())
-        //{
-        //    Console.WriteLine("비밀번호가 틀렸습니다. 프로그램을 종료합니다.");
-        //    return;
-        //}
-        //Console.WriteLine("비밀번호가 확인되었습니다. 프로그램을 시작합니다.");
         info.cert();
 
         while (true)
@@ -49,7 +40,7 @@ class Program
             // 입력에 해당하는 메서드가 존재하면 실행, 없으면 오류 메시지 출력
             if (actions.ContainsKey(input))
             {
-                await actions[input]();
+                await actions[input]();  // 비동기 작업 대기
             }
             else
             {
@@ -85,11 +76,13 @@ class Program
         await xssScanner.TestWholeStuffAsync();
     }
 
-    // SQL Injection 실행 메서드
-    static void ExecuteSqlInjections()
+    // SQL Injection 실행 메서드 (async 및 await 추가)
+    static async Task ExecuteSqlInjections()  // 수정: async 추가
     {
         Console.WriteLine("SQL Injections 를 선택하셨습니다.");
-        sqlinjections_vulnerable.sqlinjection();
+        string url = "http://192.168.0.119:3000/#/login";
+        SqlInjectionScanner scanner = new SqlInjectionScanner(url);
+        await scanner.TestSqlInjection();  // await 사용하여 작업 완료 후 다음 코드 실행
     }
 
     // Brute Force 공격 실행 메서드
