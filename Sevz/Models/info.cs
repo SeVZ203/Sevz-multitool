@@ -3,8 +3,10 @@ using Sevz.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using VulnerabilityScanner;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Sevz.Models
 {
@@ -114,6 +116,50 @@ namespace Sevz.Models
 
             // 웹 애플리케이션 스캔 호출
             await WebScannerService.ScanWebApplication(fullUrl);
+        }
+        public static void cert()
+        {
+            // 인증서 주체 이름 (CN)에 따라 인증서 검색
+            string certificateCN = "sevz";
+
+            // 시스템 인증서 저장소에서 인증서 가져오기
+            X509Certificate2 certificate = GetCertificateFromStore(certificateCN);
+
+        if (certificate != null)
+        {
+            Console.WriteLine("인증서가 성공적으로 가져와졌습니다.");
+            Console.WriteLine($"주체 이름: {certificate.Subject}");
+            Console.WriteLine($"지문: {certificate.Thumbprint}");
+
+            // 여기에서 인증서를 사용한 추가 로직을 작성할 수 있습니다.
+        }
+        else
+        {
+            Console.WriteLine("인증서를 찾을 수 없습니다.");
+        }
+        }
+        static X509Certificate2 GetCertificateFromStore(string subjectName)
+        {
+            // 현재 사용자의 인증서 저장소에서 인증서 검색
+            using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+            {
+                store.Open(OpenFlags.ReadOnly);
+
+                // 저장소에서 모든 인증서 가져오기
+                X509Certificate2Collection certCollection = store.Certificates;
+
+                // 주체 이름으로 인증서 검색
+                foreach (var cert in certCollection)
+                {
+                    if (cert.Subject.Contains(subjectName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return cert;
+                    }
+                }
+            }
+
+            // 인증서를 찾지 못했을 경우 null 반환
+            return null;
         }
 
 

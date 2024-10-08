@@ -29,15 +29,16 @@ class Program
 
     static async Task Main(string[] args)
     {
-        PasswordService.LoadConfiguration();
-        PasswordService.LoadConfiguration(); //appsetting 설정된 비밀번호 체크
-        //design.PrintSevz();
-        if (!PasswordService.CheckPassword())
-        {
-            Console.WriteLine("비밀번호가 틀렸습니다. 프로그램을 종료합니다.");
-            return;
-        }
-        Console.WriteLine("비밀번호가 확인되었습니다. 프로그램을 시작합니다.");
+        //PasswordService.LoadConfiguration();
+        //PasswordService.LoadConfiguration(); //appsetting 설정된 비밀번호 체크
+        ////design.PrintSevz();
+        //if (!PasswordService.CheckPassword())
+        //{
+        //    Console.WriteLine("비밀번호가 틀렸습니다. 프로그램을 종료합니다.");
+        //    return;
+        //}
+        //Console.WriteLine("비밀번호가 확인되었습니다. 프로그램을 시작합니다.");
+        info.cert();
 
         while (true)
         {
