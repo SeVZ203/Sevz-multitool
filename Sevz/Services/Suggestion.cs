@@ -70,7 +70,13 @@ namespace VulnerabilityScanner
                 @"<script.*?>.*?</script>",  // 스크립트 태그
                 @"javascript:.*",            // 자바스크립트 호출
                 @"<img.*?onerror=.*?>",       // 이미지 태그에 onerror 이벤트
-                @"<.*?onmouseover=.*?>"       // onmouseover 이벤트
+                @"<.*?onmouseover=.*?>",       // onmouseover 이벤트
+                @"<iframe.*?>.*?</iframe>",   // iframe 태그
+                @"<.*?on\w+=.*?>",            // 모든 on 이벤트 핸들러
+                @"<.*?style=.*?>",            // style 속성
+                @"<object.*?>.*?</object>",   // object 태그
+                @"data:text/javascript;base64,.*", // base64 인코딩된 자바스크립트
+                @"<script\s+src=.*?>"         // src 속성이 있는 script 태그
             };
             int detectedxssCount = 0;
             try
@@ -247,7 +253,46 @@ namespace VulnerabilityScanner
                 // NoSQL Injection (MongoDB, 등)
                 "' OR { '$ne': null }--",  // NoSQL에서의 조건 변조
                 "' OR { '$gt': '' }--",    // 대소 비교를 통한 NoSQL Injection
-            };
+
+                // 추가 SQL Injection 패턴
+                // 다양한 조건문 조합
+                "' AND '1'='1' /*",    // 주석을 사용한 조건
+                "' OR '1'='1' /*",     // 주석을 사용한 조건
+
+                // 문자열 연결을 통한 공격
+                "'; EXEC xp_cmdshell('whoami');--", // SQL Server의 xp_cmdshell 사용
+                "'; DROP DATABASE test;--",          // 데이터베이스 삭제 시도
+
+                // 배열 기반 쿼리
+                "' AND (SELECT COUNT(*) FROM users) > 0;--", // 존재하는 레코드 수 확인
+
+                // 서브쿼리 활용
+                "' AND (SELECT TOP 1 username FROM users) IS NOT NULL--", // 사용자 존재 여부 확인
+
+                // 해킹 도구에서 사용되는 복합적인 패턴
+                "' UNION SELECT password FROM users WHERE '1'='1'--", // 비밀번호 추출 시도
+                "'; SELECT * FROM (SELECT username, password FROM users) AS derived--", // 서브쿼리 사용
+
+                // 스팸 주석과 다양한 주석 처리
+                "' OR 1=1 #",     // #로 주석 처리
+                "' OR 1=1 -- ",   // 공백 후 주석 처리
+
+                // NoSQL Injection 관련 추가 패턴
+                "' OR { '$eq': null }--", // NoSQL에서의 조건 변조
+                "' OR { '$exists': true }--", // 필드 존재 여부 확인
+
+                // 복잡한 다중 조건
+                "' OR 1=1 UNION ALL SELECT username, password FROM users--", // UNION ALL 사용
+                "' OR (SELECT COUNT(*) FROM information_schema.tables) > 0--", // 테이블 존재 여부 확인
+
+                // 잘못된 타입 캐스팅 시도
+                "' AND 1=CAST('a' AS INT)--", // 타입 불일치
+                "' AND 1=CONVERT(VARCHAR, GETDATE())--", // 날짜 형식 변환
+
+                // 데이터베이스 특정 함수 사용
+                "'; SELECT DATABASE();--", // 현재 데이터베이스 이름 확인
+                "'; SELECT USER();--"      // 현재 사용자 확인
+             };
 
             int detectedsqlCount = 0;
 
