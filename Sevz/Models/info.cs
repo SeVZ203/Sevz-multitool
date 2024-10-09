@@ -34,20 +34,32 @@ namespace Sevz.Models
             Console.WriteLine("+----------------+------------------+");
             Console.WriteLine();
         }
-
-        public static void AlertWarning()
+        public static bool AlertWarning()
         {
             // 경고 메시지 출력
             Console.WriteLine("경고: 이 작업은 공격 기법으로 간주될 수 있으며, 사용자는 이에 따른 책임이 있습니다.");
-            Console.Write("계속 진행하시겠습니까? (Y/N)");
 
-            // 사용자 입력 받기
-            string userInput = Console.ReadLine();
-
-            if (userInput?.ToUpper() != "Y")
+            while (true)
             {
-                Console.WriteLine("작업이 취소되었습니다.");
-                return;
+                Console.Write("계속 진행하시겠습니까? (Y/N): ");
+                string userInput = Console.ReadLine();
+
+                // 입력이 'Y' 또는 'y'일 경우 true 반환
+                if (userInput?.ToUpper() == "Y")
+                {
+                    return true;
+                }
+                // 입력이 'N' 또는 'n'일 경우 false 반환
+                else if (userInput?.ToUpper() == "N")
+                {
+                    Console.WriteLine("작업이 취소되었습니다.");
+                    return false;
+                }
+                // 다른 입력인 경우 안내 메시지 출력 후 반복
+                else
+                {
+                    Console.WriteLine("잘못된 입력입니다. 'Y' 또는 'N'을 입력하세요.");
+                }
             }
         }
 
@@ -125,18 +137,18 @@ namespace Sevz.Models
             // 시스템 인증서 저장소에서 인증서 가져오기
             X509Certificate2 certificate = GetCertificateFromStore(certificateCN);
 
-        if (certificate != null)
-        {
-            Console.WriteLine("인증서가 성공적으로 가져와졌습니다.");
-            Console.WriteLine($"주체 이름: {certificate.Subject}");
-            Console.WriteLine($"지문: {certificate.Thumbprint}");
+            if (certificate != null)
+            {
+                Console.WriteLine("인증서가 성공적으로 가져와졌습니다.");
+                Console.WriteLine($"주체 이름: {certificate.Subject}");
+                Console.WriteLine($"지문: {certificate.Thumbprint}");
 
-            // 여기에서 인증서를 사용한 추가 로직을 작성할 수 있습니다.
-        }
-        else
-        {
-            Console.WriteLine("인증서를 찾을 수 없습니다.");
-        }
+                // 여기에서 인증서를 사용한 추가 로직을 작성할 수 있습니다.
+            }
+            else
+            {
+                Console.WriteLine("인증서를 찾을 수 없습니다.");
+            }
         }
         static X509Certificate2 GetCertificateFromStore(string subjectName)
         {
