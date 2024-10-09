@@ -16,6 +16,7 @@ namespace Sevz.Services
             {
                 return;
             }
+            if (!PasswordService.CheckPassword()) return;
             // 로그인 URL 입력 받기
             Console.Write("Enter the login URL (test server): ");
             string loginUrl = Console.ReadLine();

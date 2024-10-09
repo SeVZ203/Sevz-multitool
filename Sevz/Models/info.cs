@@ -16,8 +16,8 @@ namespace Sevz.Models
         {
             string savedIp = SetIP.GetSavedIp();    // 변경된 IP나 기본 IP를 가져옴
             string defaultIp = SetIP.GetDefaultIp(); // 기본 IP
-            string savedPort = SetPort.GetSavedPort();  // 변경된 포트나 기본 포트를 가져옴
-            string defaultPort = SetPort.GetDefaultPort(); // 기본 포트
+            string savedPort = SetPortt.GetSavedPort();  // 변경된 포트나 기본 포트를 가져옴
+            string defaultPort = SetPortt.GetDefaultPort(); // 기본 포트
 
             // 테이블 형식으로 IP와 포트 정보 출력
             Console.WriteLine();
@@ -79,7 +79,7 @@ namespace Sevz.Models
             Console.Write("포트를 입력하세요 (빈칸일 경우 저장된 포트 사용): ");
             string portInput = Console.ReadLine();
 
-            string port = string.IsNullOrEmpty(portInput) ? SetPort.GetSavedPort() : portInput;
+            string port = string.IsNullOrEmpty(portInput) ? SetPortt.GetSavedPort() : portInput;
 
             Console.WriteLine($"사용 중인 포트: {port}");
 
@@ -105,7 +105,7 @@ namespace Sevz.Models
             // 포트 입력받기 또는 저장된 포트 가져오기
             Console.Write("포트를 입력하세요 (빈칸일 경우 저장된 포트 사용): ");
             string portInput = Console.ReadLine();
-            string port = string.IsNullOrEmpty(portInput) ? SetPort.GetSavedPort() : portInput;
+            string port = string.IsNullOrEmpty(portInput) ? SetPortt.GetSavedPort() : portInput;
 
             Console.WriteLine($"사용 중인 포트: {port}");
 
@@ -129,6 +129,87 @@ namespace Sevz.Models
             // 웹 애플리케이션 스캔 호출
             await WebScannerService.ScanWebApplication(fullUrl);
         }
+
+        public static async Task ExecuteCsrfScan()
+        {
+            Console.Write("스캔할 URL을 입력하세요 (http/https 포함): ");
+            string url = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(url))
+            {
+                Console.WriteLine("유효하지 않은 URL입니다. 스캔을 종료합니다.");
+                return;
+            }
+
+            Console.Write("포트를 입력하세요 (빈칸일 경우 기본 포트 사용): ");
+            string portInput = Console.ReadLine();
+            string port = string.IsNullOrEmpty(portInput) ? string.Empty : portInput;
+
+            Uri uri;
+            try
+            {
+                uri = new Uri(url);
+            }
+            catch (UriFormatException)
+            {
+                Console.WriteLine("유효하지 않은 URL 형식입니다.");
+                return;
+            }
+
+            string fullUrl = string.IsNullOrEmpty(port) ?
+                             $"{uri.Scheme}://{uri.Host}{uri.PathAndQuery}" :
+                             $"{uri.Scheme}://{uri.Host}:{port}{uri.PathAndQuery}";
+
+            Console.WriteLine($"최종 URL: {fullUrl}");
+
+            // CsrfScanner 인스턴스 생성 후 메서드 호출
+            CsrfScanner csrfScanner = new CsrfScanner();
+            await csrfScanner.CheckCsrfProtection(fullUrl);
+        }
+        //public static async Task ExecuteOpenRedirectScan()
+        //{
+        //    Console.Write("스캔할 URL을 입력하세요 (http/https 포함): ");
+        //    string url = Console.ReadLine();
+
+        //    if (string.IsNullOrEmpty(url))
+        //    {
+        //        Console.WriteLine("유효하지 않은 URL입니다. 스캔을 종료합니다.");
+        //        return;
+        //    }
+
+        //    Console.Write("공격 URL을 입력하세요 (리다이렉트 테스트용): ");
+        //    string attackUrl = Console.ReadLine();
+
+        //    if (string.IsNullOrEmpty(attackUrl))
+        //    {
+        //        Console.WriteLine("유효하지 않은 공격 URL입니다. 스캔을 종료합니다.");
+        //        return;
+        //    }
+
+        //    Console.Write("포트를 입력하세요 (빈칸일 경우 기본 포트 사용): ");
+        //    string portInput = Console.ReadLine();
+        //    string port = string.IsNullOrEmpty(portInput) ? string.Empty : portInput;
+
+        //    Uri uri;
+        //    try
+        //    {
+        //        uri = new Uri(url);
+        //    }
+        //    catch (UriFormatException)
+        //    {
+        //        Console.WriteLine("유효하지 않은 URL 형식입니다.");
+        //        return;
+        //    }
+
+        //    string fullUrl = string.IsNullOrEmpty(port) ?
+        //                     $"{uri.Scheme}://{uri.Host}{uri.PathAndQuery}" :
+        //                     $"{uri.Scheme}://{uri.Host}:{port}{uri.PathAndQuery}";
+
+        //    Console.WriteLine($"최종 URL: {fullUrl}");
+
+        //    OpenRedirectScanner openRedirectScanner = new OpenRedirectScanner();
+        //    await openRedirectScanner.CheckOpenRedirect(fullUrl, attackUrl);
+        //}
         public static void cert()
         {
             // 인증서 주체 이름 (CN)에 따라 인증서 검색
@@ -148,6 +229,7 @@ namespace Sevz.Models
             else
             {
                 Console.WriteLine("인증서를 찾을 수 없습니다.");
+                //Environment.Exit(0); // 프로그램 종료
             }
         }
         static X509Certificate2 GetCertificateFromStore(string subjectName)

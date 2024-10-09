@@ -14,6 +14,7 @@ namespace Sevz.Services
         {
             // 경고 메시지 출력 
             info.AlertWarning();
+            if (!PasswordService.CheckPassword()) return;
             Console.WriteLine($"IP {ip}의 포트를 스캔합니다...");
 
             int startPort = 1;  // 시작 포트

@@ -16,7 +16,17 @@ namespace Sevz.Services
         {
             Console.Write("비밀번호를 입력하세요: ");
             string inputPassword = Console.ReadLine();
-            return inputPassword == Password;
+
+            if (inputPassword == Password)
+            {
+                Console.WriteLine("비밀번호가 확인되었습니다. 프로그램을 시작합니다.");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("비밀번호가 틀렸습니다. 메인으로 돌아갑니다.");
+                return false;
+            }
         }
 
         // appsettings.json에서 비밀번호, 네트워크 설정을 로드
