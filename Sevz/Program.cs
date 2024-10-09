@@ -73,7 +73,7 @@ class Program
     {
         Console.WriteLine("XSS 을 선택하셨습니다.");
         XssScannerTest xssScanner = new XssScannerTest();
-        await xssScanner.TestWholeStuffAsync();
+        await xssScanner.TestXSS();
     }
 
     // SQL Injection 실행 메서드 (async 및 await 추가)
