@@ -16,8 +16,8 @@ namespace Sevz.Models
         {
             string savedIp = SetIP.GetSavedIp();    // 변경된 IP나 기본 IP를 가져옴
             string defaultIp = SetIP.GetDefaultIp(); // 기본 IP
-            string savedPort = SetPortt.GetSavedPort();  // 변경된 포트나 기본 포트를 가져옴
-            string defaultPort = SetPortt.GetDefaultPort(); // 기본 포트
+            string savedPort = SetPort.GetSavedPort();  // 변경된 포트나 기본 포트를 가져옴
+            string defaultPort = SetPort.GetDefaultPort(); // 기본 포트
 
             // 테이블 형식으로 IP와 포트 정보 출력
             Console.WriteLine();
@@ -79,7 +79,7 @@ namespace Sevz.Models
             Console.Write("포트를 입력하세요 (빈칸일 경우 저장된 포트 사용): ");
             string portInput = Console.ReadLine();
 
-            string port = string.IsNullOrEmpty(portInput) ? SetPortt.GetSavedPort() : portInput;
+            string port = string.IsNullOrEmpty(portInput) ? SetPort.GetSavedPort() : portInput;
 
             Console.WriteLine($"사용 중인 포트: {port}");
 
@@ -105,7 +105,7 @@ namespace Sevz.Models
             // 포트 입력받기 또는 저장된 포트 가져오기
             Console.Write("포트를 입력하세요 (빈칸일 경우 저장된 포트 사용): ");
             string portInput = Console.ReadLine();
-            string port = string.IsNullOrEmpty(portInput) ? SetPortt.GetSavedPort() : portInput;
+            string port = string.IsNullOrEmpty(portInput) ? SetPort.GetSavedPort() : portInput;
 
             Console.WriteLine($"사용 중인 포트: {port}");
 

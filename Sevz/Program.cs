@@ -52,7 +52,7 @@ class Program
                         }
                         else if (commandParts[1].ToLower() == "port")
                         {
-                            SetPortt.SetPORT(commandParts[2]);
+                            SetPort.SetPORT(commandParts[2]);
                         }
                         else
                         {

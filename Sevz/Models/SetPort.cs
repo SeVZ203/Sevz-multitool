@@ -1,7 +1,7 @@
 ﻿using Sevz.Services;
 using System;
 
-public static class SetPortt
+public static class SetPort
 {
     private static string savedPort = string.Empty;
 
