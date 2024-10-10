@@ -31,6 +31,7 @@ class Program
     {
         info.cert();
         PasswordService.LoadConfiguration();
+        DisplayMenu();
         while (true)
         {
             Console.Write("\n명령어를 입력하세요 (help, select <번호>, run, exit): ");
