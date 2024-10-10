@@ -20,7 +20,7 @@ public class CsrfScanner
     public async Task CheckCsrfProtection(string url)
     {
         info.AlertWarning();
-        if (!PasswordService.CheckPassword()) return;
+        //if (!PasswordService.CheckPassword()) return;
         // 1. GET 요청을 보내 CSRF 토큰 필드 검색
         HttpResponseMessage response = await _client.GetAsync(url);
         string responseBody = await response.Content.ReadAsStringAsync();

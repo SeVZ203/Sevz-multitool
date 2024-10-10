@@ -15,7 +15,7 @@ namespace Sevz.Services
         public static void ICMP()
         {
             info.AlertWarning();
-            if (!PasswordService.CheckPassword()) return;
+            //if (!PasswordService.CheckPassword()) return;
             // Target IP address or hostname
             string target = SetIP.GetSavedIp();
 
