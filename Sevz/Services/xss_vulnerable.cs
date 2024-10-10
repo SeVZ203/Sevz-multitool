@@ -2,11 +2,6 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Xunit;
-using Moq;
-using WireMock.Server;
-using WireMock.RequestBuilders;
-using WireMock.ResponseBuilders;
 
 namespace Sevz.Services
 {
@@ -14,50 +9,44 @@ namespace Sevz.Services
     {
         private static readonly HttpClient client = new HttpClient();
 
-        //[Fact]
-        public async Task TestWholeStuffAsync()
+        public async Task TestXSS()
         {
-            // WireMock 서버를 시작하여 HTTP 요청을 모의(mock)함
-            var server = WireMockServer.Start();
-
-            // 모의 서버에 대한 GET 및 POST 요청 설정
-            server
-                .Given(Request.Create().WithPath("/").UsingGet())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody("Hello there"));
-
-            server
-                .Given(Request.Create().WithPath("/").UsingPost())
-                .RespondWith(Response.Create().WithStatusCode(200).WithBody("Hello there"));
-
-            // 요청을 담을 리스트
-            List<HttpRequestMessage> allRequests = new List<HttpRequestMessage>();
-
-            // GET 요청 생성
-            var request1 = new HttpRequestMessage(HttpMethod.Get, $"{server.Url}/");
-            allRequests.Add(request1);
-
-            // GET 요청 (쿼리 파라미터 포함)
-            var request2 = new HttpRequestMessage(HttpMethod.Get, $"{server.Url}/?foo=bar");
-            allRequests.Add(request2);
-
-            // POST 요청 (파일 업로드 포함)
-            var request3 = new HttpRequestMessage(HttpMethod.Post, $"{server.Url}/?foo=bar");
-            var content = new MultipartFormDataContent();
-            content.Add(new StringContent("b"), "a");
-            content.Add(new ByteArrayContent(new byte[] { 0x01, 0x02, 0x03 }), "file", "testfile.txt");
-            request3.Content = content;
-            allRequests.Add(request3);
-
-            // 모의 객체를 사용하여 요청 반복
-            foreach (var request in allRequests)
+            string savedIp = SetIP.GetSavedIp();
+            string savedPort = SetPort.GetSavedPort();
+            string url = $"http://{savedIp}:{savedPort}/#/";
+            
+            List<string> xssPayloads = new List<string>
             {
+                "<script>alert('XSS')</script>",
+                "<img src=x onerror=alert('XSS')>",
+                "<svg/onload=alert('XSS')>",
+                "'\"><script>alert('XSS')</script>",
+                "\" onmouseover=\"alert('XSS')\"",
+                "<iframe src=\"javascript:alert('XSS')\"></iframe>",
+                "<body onload=alert('XSS')>",
+            };
+
+            foreach(var payload in xssPayloads)
+            {
+                string testUrl = url + Uri.EscapeDataString(payload);
+                Console.WriteLine($"[+] Testing payload: {payload}");
+
+                // GET 요청 생성(쿼리 파라미터 포함)
+                var request = new HttpRequestMessage(HttpMethod.Get, testUrl);
                 var response = await client.SendAsync(request);
                 string responseBody = await response.Content.ReadAsStringAsync();
 
-                Assert.Equal("Hello there", responseBody);
+                // 응답에 페이로드가 있는지 확인
+                if (responseBody.Contains(payload))
+                {
+                    Console.WriteLine($"[!] XSS vulnerability detected! Payload: {payload}");
+                }
+                else
+                {
+                    Console.WriteLine($"[+] No XSS vulnerability found with payload: {payload}");
+                }
             }
-
-            server.Stop();
+            
         }
     }
 }

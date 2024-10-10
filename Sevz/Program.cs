@@ -157,7 +157,7 @@ class Program
     {
         Console.WriteLine("XSS 공격을 실행합니다.");
         XssScannerTest xssScanner = new XssScannerTest();
-        await xssScanner.TestWholeStuffAsync();
+        await xssScanner.TestXSS();
     }
 
     // SQL Injection 실행 메서드
