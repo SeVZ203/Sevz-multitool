@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using MySql.Data.MySqlClient;
 using System.Data;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Sevz.Models
 {
@@ -44,17 +45,28 @@ namespace Sevz.Models
                         // 쿼리 실행 및 결과 읽기
                         using (MySqlDataReader reader = command.ExecuteReader())
                         {
-                            while (reader.Read())
+                            // 데이터 있는지 확인
+                            if (reader.HasRows)
                             {
-                                // 예를 들어, CVE 정보 (cve, level, exp)를 가져와서 suggestion 리스트에 추가
-                                string cve = reader.GetString("cve");
-                                string level = reader.GetString("level");
-                                string exp = reader.GetString("exp");
 
-                                // CVE 번호와 레벨 및 설명? 추가
-                                // suggestions.Add($"CVE: {cve}, Level: {level}, Explanation: {exp}");
-                                suggestions.Add($"CVE: {cve}{Environment.NewLine}Level: {level}{Environment.NewLine}Explanation: {exp}");
+                                while (reader.Read())
+                                {
+                                    // CVE 정보 (cve, level, exp)를 가져와서 suggestion 리스트에 추가
+                                    string cve = reader.GetString("cve");
+                                    string level = reader.GetString("level");
+                                    string exp = reader.GetString("exp");
+
+                                    // CVE 번호와 레벨 및 설명? 추가
+                                    // suggestions.Add($"CVE: {cve}, Level: {level}, Explanation: {exp}");
+                                    suggestions.Add($"CVE: {cve}{Environment.NewLine}Level: {level}{Environment.NewLine}Explanation: {exp}");
+                                }
                             }
+
+                            else
+                            {
+                                // 데이터가 없을 경우 메시지 추가
+                                suggestions.Add("추천할 cve 및 공격 기법이 없습니다");
+                            }                       
                         }
                     }
                 }
