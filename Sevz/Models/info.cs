@@ -229,7 +229,7 @@ namespace Sevz.Models
             else
             {
                 Console.WriteLine("인증서를 찾을 수 없습니다.");
-                //Environment.Exit(0); // 프로그램 종료
+                Environment.Exit(0); // 프로그램 종료
             }
         }
         static X509Certificate2 GetCertificateFromStore(string subjectName)
