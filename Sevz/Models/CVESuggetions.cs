@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using MySql.Data.MySqlClient;
+using System.Data;
+
 namespace Sevz.Models
 {
     public static class AttackSuggestionService
@@ -13,25 +16,73 @@ namespace Sevz.Models
         {
             List<string> suggestions = new List<string>();
 
-            // Apache 버전별 맞춤형 공격 제안
-            if (software == "Apache")
+            // software 변수를 소문자로 변환
+            software = software.ToLower();
+
+            // cve-db 연결
+            // MySQL 연결 문자열
+            string connectionString = "Server=223.130.157.192; Database=sevztool; User ID=sevz; Password=sevzsevz;";
+
+            // MySQL 연결 객체 생성
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
+                try
+                {
+                    // 연결 열기
+                    connection.Open();
 
-                    suggestions.Add("CVE-2021-40438: Apache 2.4.41에서 SSRF(서버사이드 요청 위조) 취약점을 이용하세요.");
-                    suggestions.Add("Metasploit 모듈: exploit/multi/http/apache_optionsbleed");
+                    // SQL 쿼리 작성
+                    string query = "SELECT cve, level, exp FROM cve WHERE product = @software AND ver LIKE @version";
 
-                    suggestions.Add("CVE-2019-0211: Apache 2.4.29에서 권한 상승 취약점을 이용하세요.");
-                    suggestions.Add("Metasploit 모듈: exploit/multi/http/apache_mod_cgi_bash_env_exec");
+                    // MySqlCommand 객체 생성
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        // 쿼리 매개변수 설정
+                        command.Parameters.AddWithValue("@software", software);
+                        command.Parameters.AddWithValue("@version", "%" + version + "%"); // version이 포함된 레코드 찾기 위해 LIKE 사용
+
+                        // 쿼리 실행 및 결과 읽기
+                        using (MySqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                // 예를 들어, CVE 정보 (cve, level, exp)를 가져와서 suggestion 리스트에 추가
+                                string cve = reader.GetString("cve");
+                                string level = reader.GetString("level");
+                                string exp = reader.GetString("exp");
+
+                                // CVE 번호와 레벨 및 설명? 추가
+                                // suggestions.Add($"CVE: {cve}, Level: {level}, Explanation: {exp}");
+                                suggestions.Add($"CVE: {cve}{Environment.NewLine}Level: {level}{Environment.NewLine}Explanation: {exp}");
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.Message);
+                }
+            }
 
 
-                    suggestions.Add("CVE-2017-9798: Apache 2.2.34에서 Out of Bound Write 취약점을 이용하세요.");
-                    suggestions.Add("Metasploit 모듈: exploit/multi/http/apache_range_dos");
+            // Apache 버전별 맞춤형 공격 제안
+            if (software == "apache")
+            {
+                suggestions.Add("CVE-2021-40438: Apache 2.4.41에서 SSRF(서버사이드 요청 위조) 취약점을 이용하세요.");
+                suggestions.Add("Metasploit 모듈: exploit/multi/http/apache_optionsbleed");
+
+                suggestions.Add("CVE-2019-0211: Apache 2.4.29에서 권한 상승 취약점을 이용하세요.");
+                suggestions.Add("Metasploit 모듈: exploit/multi/http/apache_mod_cgi_bash_env_exec");
+
+
+                suggestions.Add("CVE-2017-9798: Apache 2.2.34에서 Out of Bound Write 취약점을 이용하세요.");
+                suggestions.Add("Metasploit 모듈: exploit/multi/http/apache_range_dos");
 
                 // 추가 Apache 버전별 취약점 및 공격 기법 제안 가능
             }
 
             // Nginx 버전별 맞춤형 공격 제안
-            if (software == "Nginx")
+            if (software == "nginx")
             {
                 if (version == "1.18.0")
                 {
@@ -47,7 +98,7 @@ namespace Sevz.Models
             }
 
             // Microsoft IIS 버전별 맞춤형 공격 제안
-            if (software == "IIS")
+            if (software == "iis")
             {
                 if (version == "7.5")
                 {
@@ -62,7 +113,7 @@ namespace Sevz.Models
             }
 
             // WordPress 버전별 맞춤형 공격 제안
-            if (software == "WordPress")
+            if (software == "wordpress")
             {
                 if (version == "5.7")
                 {
@@ -83,7 +134,7 @@ namespace Sevz.Models
             }
 
             // Drupal 버전별 맞춤형 공격 제안
-            if (software == "Drupal")
+            if (software == "drupal")
             {
                 if (version == "7.x")
                 {
