@@ -27,7 +27,6 @@ namespace Sevz.Models
             // MySQL 연결 객체 생성
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                suggestions.Add($"{software}, {version}");
                 try
                 {
                     // 연결 열기
