@@ -57,23 +57,30 @@ namespace Sevz.Services
             string osDetected = "알 수 없음";
             List<string> attackSuggestions = new List<string>();
 
+            // header 정보를 모두 소문자로 변경
+            serverHeader = serverHeader.ToLower();
+
+            // '/' 기준으로 분할
+            string[] parts = serverHeader.Split('/');
+            string version = parts[1];
+
             // Apache 서버 감지
-            if (serverHeader.Contains("Apache", StringComparison.OrdinalIgnoreCase))
+            if (serverHeader.Contains("apache", StringComparison.OrdinalIgnoreCase))
             {
                 osDetected = "Apache 서버";
-                attackSuggestions.AddRange(Sevz.Models.AttackSuggestionService.SuggestAttacksForVersion("Apache", "any"));
+                attackSuggestions.AddRange(Sevz.Models.AttackSuggestionService.SuggestAttacksForVersion("Apache", version));
             }
             // Nginx 서버 감지
-            else if (serverHeader.Contains("Nginx", StringComparison.OrdinalIgnoreCase))
+            else if (serverHeader.Contains("nginx", StringComparison.OrdinalIgnoreCase))
             {
                 osDetected = "Nginx 서버";
-                attackSuggestions.AddRange(Sevz.Models.AttackSuggestionService.SuggestAttacksForVersion("Nginx", "any"));
+                attackSuggestions.AddRange(Sevz.Models.AttackSuggestionService.SuggestAttacksForVersion("Nginx", version));
             }
             // Windows 서버 감지
-            else if (serverHeader.Contains("Windows", StringComparison.OrdinalIgnoreCase))
+            else if (serverHeader.Contains("windows", StringComparison.OrdinalIgnoreCase))
             {
                 osDetected = "Windows 서버";
-                attackSuggestions.AddRange(Sevz.Models.AttackSuggestionService.SuggestAttacksForVersion("IIS", "any"));
+                attackSuggestions.AddRange(Sevz.Models.AttackSuggestionService.SuggestAttacksForVersion("IIS", version));
             }
             // Linux/Unix 서버 감지
             else if (serverHeader.Contains("Linux", StringComparison.OrdinalIgnoreCase) ||
@@ -91,7 +98,7 @@ namespace Sevz.Services
                 Console.WriteLine("\n추천 공격 기법:");
                 foreach (var suggestion in attackSuggestions)
                 {
-                    Console.WriteLine($"- {suggestion}");
+                    Console.WriteLine($"{suggestion}");
                 }
             }
             else
