@@ -27,19 +27,22 @@ namespace Sevz.Models
             // MySQL 연결 객체 생성
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
+                suggestions.Add($"{software}, {version}");
                 try
                 {
                     // 연결 열기
                     connection.Open();
 
                     // SQL 쿼리 작성
-                    string query = "SELECT cve, level, exp FROM cve WHERE product = @software AND ver LIKE @version";
+                    string query = "SELECT cve, level, exp FROM cve WHERE LOWER(product) LIKE LOWER(@software) AND LOWER(ver) LIKE LOWER(@version)";
+                    //string query = "SELECT cve, level, exp FROM cve WHERE LOWER(product) = LOWER(@software) AND LOWER(ver) LIKE LOWER(@version)";
 
                     // MySqlCommand 객체 생성
                     using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
                         // 쿼리 매개변수 설정
-                        command.Parameters.AddWithValue("@software", software);
+                        command.Parameters.AddWithValue("@software", "%" + software + "%");
+                        // command.Parameters.AddWithValue("@software", software);
                         command.Parameters.AddWithValue("@version", "%" + version + "%"); // version이 포함된 레코드 찾기 위해 LIKE 사용
 
                         // 쿼리 실행 및 결과 읽기
@@ -76,7 +79,7 @@ namespace Sevz.Models
                 }
             }
 
-
+            /*
             // Apache 버전별 맞춤형 공격 제안
             if (software == "apache")
             {
@@ -169,7 +172,7 @@ namespace Sevz.Models
                     suggestions.Add("CVE-2015-8562: Joomla 3.4.5에서 PHP Object Injection 취약점을 이용하세요.");
                     suggestions.Add("Metasploit 모듈: exploit/multi/http/joomla_http_header_rce");
                 }
-            }
+            }*/
 
             return suggestions;
         }
