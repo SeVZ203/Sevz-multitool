@@ -7,6 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using VulnerabilityScanner;
 using System.Security.Cryptography.X509Certificates;
+using System.Runtime.InteropServices;
 
 namespace Sevz.Models
 {
@@ -214,9 +215,23 @@ namespace Sevz.Models
         {
             // 인증서 주체 이름 (CN)에 따라 인증서 검색
             string certificateCN = "sevz";
+	    X509Certificate2 certificate = null;
+	    
+	    // 현재 운영 체제 Windows
+	    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+	    {
+		// 시스템 인증서 저장소에서 인증서 가져오기
+		certificate = GetCertificateFromStore(certificateCN);
+	    }
+	    // 현재 운영 체제 Linux
+	    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+	    {
+		string pfxFilePath = $"/etc/ssl/certs/{certificateCN}.pfx"; // PFX 파일 경로
+           	string pfxPassword = "qhdkscjfwj1!"; // PFX 파일 비밀번호
 
-            // 시스템 인증서 저장소에서 인증서 가져오기
-            X509Certificate2 certificate = GetCertificateFromStore(certificateCN);
+                certificate = GetCertificateFromPfxFile(pfxFilePath, pfxPassword, certificateCN);
+	    }
+
 
             if (certificate != null)
             {
@@ -234,7 +249,7 @@ namespace Sevz.Models
         }
         static X509Certificate2 GetCertificateFromStore(string subjectName)
         {
-            // 현재 사용자의 인증서 저장소에서 인증서 검색
+       	    // 현재 사용자의 인증서 저장소에서 인증서 검색
             using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
             {
                 store.Open(OpenFlags.ReadOnly);
@@ -255,6 +270,39 @@ namespace Sevz.Models
             // 인증서를 찾지 못했을 경우 null 반환
             return null;
         }
+	static X509Certificate2 GetCertificateFromPfxFile(string pfxFilePath, string password, string subjectName)
+	{
+		try
+		{
+			// PFX 파일이 존재하는지 확인
+            		if (File.Exists(pfxFilePath))
+			{
+				// PFX 파일에서 인증서 로드
+                		var certificate = new X509Certificate2(pfxFilePath, password);
+
+                		// 인증서의 주체 이름(CN)을 확인하여 일치하는 경우 반환
+                		if (certificate.Subject.Contains(subjectName, StringComparison.OrdinalIgnoreCase))
+               			{
+                    			return certificate;
+                		}
+                		else
+                		{
+                    			Console.WriteLine($"지정된 주체 이름(CN)과 일치하는 인증서가 아닙니다: {certificate.Subject}");
+                    			return null;
+                		}
+            		}
+            		else
+            		{
+                		Console.WriteLine($"PFX 파일이 경로에 존재하지 않습니다: {pfxFilePath}");
+                		return null;
+            		}
+        	}
+        	catch (Exception ex)
+        	{
+            		Console.WriteLine($"인증서를 로드하는 중 오류가 발생했습니다: {ex.Message}");
+            		return null;
+        	}
+    	}
 
 
         public static class PasswordManager
