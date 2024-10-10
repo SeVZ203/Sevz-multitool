@@ -38,6 +38,7 @@ namespace Sevz.Services
                     {
                         var poweredBy = response.Headers.GetValues("X-Powered-By").FirstOrDefault();
                         Console.WriteLine($"\n서버의 X-Powered-By: {poweredBy}");
+                        DetectOperatingSystemAndServer(poweredBy);
                     }
 
                     // 웹 페이지 콘텐츠 분석 (HTML 본문)
@@ -75,6 +76,12 @@ namespace Sevz.Services
             {
                 osDetected = "Nginx 서버";
                 attackSuggestions.AddRange(Sevz.Models.AttackSuggestionService.SuggestAttacksForVersion("Nginx", version));
+            }
+            // php 서버 감지
+            else if (serverHeader.Contains("php", StringComparison.OrdinalIgnoreCase))
+            {
+                osDetected = "PHP Package";
+                attackSuggestions.AddRange(Sevz.Models.AttackSuggestionService.SuggestAttacksForVersion("php", version));
             }
             // Windows 서버 감지
             else if (serverHeader.Contains("windows", StringComparison.OrdinalIgnoreCase))

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using MySql.Data.MySqlClient;
 using System.Data;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Sevz.Models
 {
@@ -32,29 +33,42 @@ namespace Sevz.Models
                     connection.Open();
 
                     // SQL 쿼리 작성
-                    string query = "SELECT cve, level, exp FROM cve WHERE product = @software AND ver LIKE @version";
+                    string query = "SELECT cve, level, exp FROM cve WHERE LOWER(product) LIKE LOWER(@software) AND LOWER(ver) LIKE LOWER(@version)";
+                    //string query = "SELECT cve, level, exp FROM cve WHERE LOWER(product) = LOWER(@software) AND LOWER(ver) LIKE LOWER(@version)";
 
                     // MySqlCommand 객체 생성
                     using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
                         // 쿼리 매개변수 설정
-                        command.Parameters.AddWithValue("@software", software);
+                        command.Parameters.AddWithValue("@software", "%" + software + "%");
+                        // command.Parameters.AddWithValue("@software", software);
                         command.Parameters.AddWithValue("@version", "%" + version + "%"); // version이 포함된 레코드 찾기 위해 LIKE 사용
 
                         // 쿼리 실행 및 결과 읽기
                         using (MySqlDataReader reader = command.ExecuteReader())
                         {
-                            while (reader.Read())
+                            // 데이터 있는지 확인
+                            if (reader.HasRows)
                             {
-                                // 예를 들어, CVE 정보 (cve, level, exp)를 가져와서 suggestion 리스트에 추가
-                                string cve = reader.GetString("cve");
-                                string level = reader.GetString("level");
-                                string exp = reader.GetString("exp");
 
-                                // CVE 번호와 레벨 및 설명? 추가
-                                // suggestions.Add($"CVE: {cve}, Level: {level}, Explanation: {exp}");
-                                suggestions.Add($"CVE: {cve}{Environment.NewLine}Level: {level}{Environment.NewLine}Explanation: {exp}");
+                                while (reader.Read())
+                                {
+                                    // CVE 정보 (cve, level, exp)를 가져와서 suggestion 리스트에 추가
+                                    string cve = reader.GetString("cve");
+                                    string level = reader.GetString("level");
+                                    string exp = reader.GetString("exp");
+
+                                    // CVE 번호와 레벨 및 설명? 추가
+                                    // suggestions.Add($"CVE: {cve}, Level: {level}, Explanation: {exp}");
+                                    suggestions.Add($"CVE: {cve}{Environment.NewLine}Level: {level}{Environment.NewLine}Explanation: {exp}");
+                                }
                             }
+
+                            else
+                            {
+                                // 데이터가 없을 경우 메시지 추가
+                                suggestions.Add("추천할 cve 및 공격 기법이 없습니다");
+                            }                       
                         }
                     }
                 }
@@ -64,7 +78,7 @@ namespace Sevz.Models
                 }
             }
 
-
+            /*
             // Apache 버전별 맞춤형 공격 제안
             if (software == "apache")
             {
@@ -157,7 +171,7 @@ namespace Sevz.Models
                     suggestions.Add("CVE-2015-8562: Joomla 3.4.5에서 PHP Object Injection 취약점을 이용하세요.");
                     suggestions.Add("Metasploit 모듈: exploit/multi/http/joomla_http_header_rce");
                 }
-            }
+            }*/
 
             return suggestions;
         }
