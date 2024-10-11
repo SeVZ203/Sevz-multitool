@@ -41,6 +41,7 @@ class Program
             switch (commandParts[0].ToLower())
             {
                 case "help":
+                    DisplayMenu();
                     DisplayCommand();
                     break;
 
