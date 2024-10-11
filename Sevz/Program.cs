@@ -41,7 +41,7 @@ class Program
             switch (commandParts[0].ToLower())
             {
                 case "help":
-                    DisplayMenu();
+                    DisplayCommand();
                     break;
 
                 case "set":
@@ -118,6 +118,10 @@ class Program
         Console.WriteLine("8. 서버분석");
         Console.WriteLine("9. CSRF 취약점 검사");
         //Console.WriteLine("10. Open Redirect 취약점 검사");
+    }
+
+    static void DisplayCommand()
+    {
         Console.WriteLine("\n명령어 목록:");
         Console.WriteLine("  help                 - 메뉴와 명령어 목록 표시");
         Console.WriteLine("  set ip               - IP 주소 설정");
@@ -133,7 +137,7 @@ class Program
     //    SetIP.SetIp(); // SetIP 클래스에 SaveIp 메서드가 정의되어야 합니다
     //    //Console.WriteLine($"IP 주소가 {ipAddress}로 설정되었습니다.");
     //}
-        
+
     //static void SetPort(string portNumber)
     //{
     //    SetPortt.SetPORT(); // SetPort 클래스에 SavePort 메서드가 정의되어야 합니다
