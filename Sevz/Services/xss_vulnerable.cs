@@ -46,10 +46,16 @@ namespace Sevz.Services
 
                 // Chrome 옵션 설정
                 ChromeOptions options = new ChromeOptions();
-                options.AddArgument("--log-level=3");  // 로그 레벨을 3으로 설정 (오류만 표시)
-                options.AddArgument("--silent");  // 조용한 모드 설정
+                options.AddArgument("--headless");  // 헤드리스 모드 사용
+                options.AddArgument("--no-sandbox");  // 샌드박스 비활성화
+                options.AddArgument("--disable-dev-shm-usage");  // /dev/shm 사용 비활성화
+                options.AddArgument("--disable-gpu");  // GPU 비활성화
+                options.AddArgument("--window-size=1920x1080");  // 화면 크기 설정
+                options.AddArgument("--disable-software-rasterizer");  // 소프트웨어 렌더링 비활성화
+                options.AddArgument("--remote-debugging-port=9222");  // 디버깅 포트 설정
+		options.AddArgument("--user-data-dir=/tmp/chrome_user_data"); // 사용자 데이터 디렉터리 설정
 
-                using (IWebDriver driver = new ChromeDriver(chromeService, options))
+		using (IWebDriver driver = new ChromeDriver(chromeService, options))
                 {
                     try
                     {

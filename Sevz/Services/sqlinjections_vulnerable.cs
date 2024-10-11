@@ -30,8 +30,8 @@ public class SqlInjectionScanner
 
             var formData = new Dictionary<string, string>
             {
-                { "Username", payload },
-                { "Password", "abcd" }
+                { "email", payload },
+                { "password", "abcd" }
             };
 
             var response = await SendHttpRequest(targetUrl, formData);
