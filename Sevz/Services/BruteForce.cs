@@ -17,9 +17,10 @@ namespace Sevz.Services
                 return;
             }
             //if (!PasswordService.CheckPassword()) return;
-            // 로그인 URL 입력 받기
-            Console.Write("Enter the login URL (test server): ");
-            string loginUrl = Console.ReadLine();
+            // 로그인 URL
+            string savedIp = SetIP.GetSavedIp();
+            string savedPort = SetPort.GetSavedPort();
+            string loginUrl = $"http://{savedIp}:{savedPort}/wp-login.php";
 
             // 사용자 이름 입력 받기
             Console.Write("Enter the username: ");
