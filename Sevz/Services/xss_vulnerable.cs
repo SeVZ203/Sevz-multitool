@@ -33,12 +33,6 @@ namespace Sevz.Services
                 string testUrl = url + Uri.EscapeDataString(payload);
                 Console.WriteLine($"[+] Testing payload: {payload}");
 
-                // GET 요청 생성(쿼리 파라미터 포함)
-                var request = new HttpRequestMessage(HttpMethod.Get, testUrl);
-                var response = await client.SendAsync(request);
-                string statusCode = response.StatusCode.ToString();
-                string responseBody = await response.Content.ReadAsStringAsync();
-
                 // ChromeDriver 서비스 설정
                 var chromeService = ChromeDriverService.CreateDefaultService();
                 chromeService.SuppressInitialDiagnosticInformation = true;  // 초기 진단 메시지 숨기기
