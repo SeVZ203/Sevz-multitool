@@ -28,6 +28,7 @@ namespace Sevz.Services
 
             int pingcount = 0;
             bool isFirstPing = true;
+            isRunning = true;
             // Ping 공격을 별도의 스레드에서 실행
             Task.Run(() =>
             {
