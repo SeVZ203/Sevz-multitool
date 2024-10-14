@@ -46,8 +46,8 @@ namespace Sevz.Services
                     // 로그인 폼 데이터 설정
                     var postData = new FormUrlEncodedContent(new[]
                     {
-                        new KeyValuePair<string, string>("username", username),
-                        new KeyValuePair<string, string>("password", password)
+                        new KeyValuePair<string, string>("log", username),
+                        new KeyValuePair<string, string>("pwd", password)
                     });
 
                     // POST 요청을 통해 로그인 시도
@@ -55,6 +55,7 @@ namespace Sevz.Services
                     string resultContent = await response.Content.ReadAsStringAsync();
 
                     Console.WriteLine($"Trying password: {password}");
+                    //Console.WriteLine($"Result: {resultContent}");
 
                     // 실패 메시지가 응답에 포함되면 실패로 간주
                     if (resultContent.Contains(failureMessage))
