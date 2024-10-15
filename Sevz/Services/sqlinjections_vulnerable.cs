@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using static OpenAI.ObjectModels.SharedModels.IOpenAiModels;
 using static OpenAI.ObjectModels.StaticValues.AssistantsStatics.MessageStatics;
 
 public class SqlInjectionScanner
 {
     private string targetUrl;
 
-    public SqlInjectionScanner(string url)
+    public SqlInjectionScanner()
     {
-        targetUrl = url;
-
+        
+        string savedIp = SetIP.GetSavedIp();
+        string savedPort = SetPort.GetSavedPort();
+        targetUrl = $"http://{savedIp}:{savedPort}/rest/user/login";
+    
     }
 
     public async Task TestSqlInjection()

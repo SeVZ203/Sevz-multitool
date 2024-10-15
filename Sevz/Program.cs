@@ -170,8 +170,7 @@ class Program
     static async Task ExecuteSqlInjections()
     {
         Console.WriteLine("SQL Injection 공격을 실행합니다.");
-        string url = "http://192.168.0.119:3000/rest/user/login";
-        SqlInjectionScanner scanner = new SqlInjectionScanner(url);
+        SqlInjectionScanner scanner = new SqlInjectionScanner();
         await scanner.TestSqlInjection();
     }
 
